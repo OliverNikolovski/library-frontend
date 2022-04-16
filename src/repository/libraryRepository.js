@@ -4,8 +4,8 @@ const LibraryRepository = {
 
     controller: new AbortController(),
 
-    fetchBooks() {
-        return axios.get("/books/all");
+    fetchBooks(pageNumber, pageSize) {
+        return axios.get(`/books?page=${pageNumber}&size=${pageSize}`);
     },
 
     getBook(id) {

@@ -16,16 +16,16 @@ const BookAdd = ({ categories, authors }) => {
         setIsAddInProgress(true);
         LibraryRepository.addBook(name, category, authorId, availableCopies)
             .then(response => {
-                console.log("Added book: ", response.data);
                 setIsAddInProgress(false);
                 setError(null);
                 navigate("/");
             })
             .catch(err => {
-                console.log(err.message);
+                console.log(err);
                 setError(err.message);
                 setIsAddInProgress(false);
             })
+        
     }
 
     return (
@@ -36,7 +36,7 @@ const BookAdd = ({ categories, authors }) => {
                 <div className="mt-3 text-start">
                     <label htmlFor="name" className="form-label lead">Name</label>
                     <input type="text" name="name" id="name" className="form-control form-control-lg"
-                        value={name} required placeholder="Enter book name"
+                        value={name} placeholder="Enter book name" required={true}
                         onChange={(e) => setName(e.target.value)} />
                 </div>
                 <div className="mt-3 text-start">
@@ -67,8 +67,7 @@ const BookAdd = ({ categories, authors }) => {
                 </div>
                 <div className="row ms-1 mt-5">
                     {!isAddInProgress && 
-                        <button type="submit" className="btn btn-lg btn-primary col-md-4"
-                            onClick={handleSubmit}>Add</button>}
+                        <button type="submit" className="btn btn-lg btn-primary col-md-4">Add</button>}
                     {isAddInProgress && 
                         <button className="btn btn-lg btn-primary col-md-4" disabled>Adding...</button>}
                 </div>

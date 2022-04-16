@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 const Book = ({ book, deleteBook, markAsTaken, idx }) => {
     return (
         <tr>
-            <th scope="row">{idx + 1}</th>
+            <th scope="row">{idx}</th>
             <td>{book.name}</td>
             <td>{book.category}</td>
             <td>{book.author?.name + ' ' + book.author?.surname}</td>

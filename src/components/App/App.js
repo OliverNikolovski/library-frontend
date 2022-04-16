@@ -38,8 +38,8 @@ function App() {
         <Header />
         <div className="container">
           <Routes>
-            <Route path="/" element={ <Books/> } />
-            <Route path="/books" element={ <Books/> } />
+            <Route path="/" element={ <Books pageSize={5}/> } />
+            <Route path="/books" element={ <Books pageSize={5}/> } />
             <Route path="/categories" element={ <Categories categories={categories}/> }/>
             <Route path="/books/edit/:id" element={ <BookEdit categories={categories} authors={authors}/> } />
             <Route path="/books/add" element={ <BookAdd categories={categories} authors={authors}/> } />

@@ -38,13 +38,12 @@ const BookEdit = ({ categories, authors }) => {
         setUpdateInProgress(true);
         LibraryRepository.editBook(id, name, category, authorId, availableCopies)
             .then(response => {
-                console.log("Edited book:", response);
                 setUpdateInProgress(false);
                 setError(null);
                 navigate("/");
             })
             .catch(err => {
-                console.log(err.message);
+                console.log(err);
                 setError(err.message);
                 setUpdateInProgress(false);
             });
@@ -52,7 +51,10 @@ const BookEdit = ({ categories, authors }) => {
 
     return (
         <div className="container">
-            {isPending && <div className="display-1">Loading...</div>}
+            {isPending && 
+            <div className="spinner-border mt-3" role="status">
+                <span className="visually-hidden">Loading...</span>
+            </div>}
             {error && <div className="display-3 text-danger">{error}</div>}
             {loadedSuccessfully &&
                 <form onSubmit={handleSubmit} className="form-floating mt-3">
@@ -61,7 +63,6 @@ const BookEdit = ({ categories, authors }) => {
                         <label htmlFor="name" className="form-label lead">Name</label>
                         <input type="text" name="name" id="name" className="form-control form-control-lg"
                             value={name} onChange={(e) => setName(e.target.value)} required />
-
                     </div>
                     <div className="mt-3 text-start">
                         <label htmlFor="category" className="form-label lead">Category</label>
@@ -89,8 +90,7 @@ const BookEdit = ({ categories, authors }) => {
                     </div>
                     <div className="row ms-1 mt-5">
                         {!updateInProgress && 
-                            <button type="submit" className="btn btn-lg btn-primary col-md-4"
-                                onClick={handleSubmit}>Update</button>}
+                            <button type="submit" className="btn btn-lg btn-primary col-md-4">Update</button>}
                         {updateInProgress && 
                             <button className="btn btn-lg btn-primary col-md-4" disabled>Updating...</button>}
                     </div>

@@ -1,20 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import LibraryRepository from '../../../repository/libraryRepository';
 import Book from '../Book/book';
 
-const Books = () => {
+const Books = ({pageSize}) => {
     const [books, setBooks] = useState([]);
     const [isPending, setIsPending] = useState(true);
     const [error, setError] = useState(null);
+    const [pageNumber, setPageNumber] = useState(0);
+    const page = useRef(null);
+    const pageItems = useRef([]);
 
-    const retrieveBooks = () => {
-        LibraryRepository.fetchBooks()
+    function retrieveBooks(pageNumber, pageSize) {
+        setIsPending(true);
+        setBooks([]);
+        LibraryRepository.fetchBooks(pageNumber, pageSize)
             .then(response => {
-               // console.log(response);
+                page.current = response.data;
+                pageItems.current = [...Array(page.current.totalPages).keys()];
                 setIsPending(false);
                 setError(null);
-                setBooks(response.data);
+                setBooks(page.current.content);
             })
             .catch(err => {
                 console.log(err);
@@ -26,9 +32,8 @@ const Books = () => {
     const deleteBook = (id) => {
         LibraryRepository.deleteBook(id)
             .then(response => {
-                console.log(response);
                 setError(null);
-                retrieveBooks();
+                retrieveBooks(pageNumber, pageSize);
             })
             .catch(err => {
                 console.log(err);
@@ -50,14 +55,18 @@ const Books = () => {
     }
 
     useEffect(() => {
-        retrieveBooks();
-    }, []);
+        retrieveBooks(pageNumber, pageSize);
+        return LibraryRepository.abortRequest();
+    }, [pageNumber, pageSize]);
 
     return (
-        <div className="table-responsive">
-            {isPending && <div className="display-1">Loading...</div>}
-            {error && <div className="text-danger">{error}</div>}
-            {books && 
+        <div className="table-responsive overflow-hidden">
+            {isPending && 
+                <div className="spinner-border mt-3" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>}
+            {error && <div className="text-danger display-3">{error}</div>}
+            {!isPending && 
             <table className="table table-striped table-hover mt-3 caption-top">
                 <caption>List of books</caption>
                 <thead>
@@ -72,13 +81,38 @@ const Books = () => {
                 </thead>
                 <tbody>
                     {books && books.map((book, index) => (
-                        <Book book={book} deleteBook={deleteBook} markAsTaken={markAsTaken} key={book.id} idx={index}/>
+                        <Book book={book} deleteBook={deleteBook} markAsTaken={markAsTaken} key={book.id} 
+                            idx={pageNumber * pageSize + index + 1}/>
                     ))}
                 </tbody>
             </table>}
-            <div className="d-flex w-100 mx-auto my-2 justify-content-center">
+            {!isPending && 
+            <nav aria-label="Book pagination">
+                <ul className="pagination justify-content-center">
+                    <li className={pageNumber > 0 ? "page-item" : "page-item disabled"}>
+                        <button type="button" className="page-link" aria-label="Previous"
+                            onClick={() => setPageNumber(pageNumber - 1)}>
+                            <span aria-hidden="true">Prev</span>
+                        </button>
+                    </li>
+                    {pageItems.current.map(item => (
+                        <li className={pageNumber !== item ? "page-item" : "page-item active"} key={item}>
+                            <button type="button" className="page-link" onClick={() => setPageNumber(item)}
+                                disabled={pageNumber === item}>{item + 1}</button>
+                        </li>
+                    ))}
+                    <li className={pageNumber + 1 < page.current?.totalPages ? "page-item" : "page-item disabled"}>
+                        <button type="button" className="page-link" aria-label="Next"
+                            onClick={() => setPageNumber(pageNumber + 1)}>
+                            <span aria-hidden="true">Next</span>
+                        </button>
+                    </li>
+                </ul>
+            </nav>}
+            {!isPending && 
+            <div className="d-flex w-100 mx-auto my-5 justify-content-center">
                 <Link to="/books/add" className="btn btn-primary w-50">Add a new book</Link>
-            </div>
+            </div>}
         </div>
     );
 }
