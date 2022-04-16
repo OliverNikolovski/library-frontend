@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const instance = axios.create({
-    baseURL: "http://192.168.0.30:8080/api",
+    baseURL: "https://library-emt-heroku.herokuapp.com/api",
     headers: {
         // 'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
